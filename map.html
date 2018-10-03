@@ -1,0 +1,82 @@
+<html>
+ <head>
+  <link rel="stylesheet" href="styles.css" type="text/css">
+ </head>
+ <body>
+   <div class="container">
+    <div class="options-box">
+      <h1>Neighborhood Map</h1>
+      <div>
+        <input id="show-listings" type="button" value="Show Listings">
+        <input id="hide-listings" type="button" value="Hide Listings">
+      </div>
+    </div>
+
+    <div id="map"></div>
+   </div>
+   <script>
+     var map;
+     var markers = [];
+     function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 40.7413549, lng: -73.99802439999996},
+        zoom: 13
+      });
+      var locations = [
+        {title: 'Park Avenue Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
+        {title: 'Chelsea Loft', location: {lat: 40.7444883, lng: -73.9949465}},
+        {title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
+        {title: 'East Village Hip Studio', location: {lat: 40.7281777, lng: -73.984377}},
+        {title: 'TriBeCa Artsy Bachelor Pad', location: {lat: 40.7195264, lng: -74.0089934}},
+        {title: 'Chinatown Homey Space', location: {lat: 40.7180627, lng: -73.9961237}}
+      ];
+      var largeInfoWindow = new google.maps.InfoWindow();
+      for (var i = 0; i < locations.length; i++) {
+        var position = locations[i].location;
+        var title = locations[i].title;
+        var marker = new google.maps.Marker({
+          map: map,
+          position: position,
+          title: title,
+          animation: google.maps.Animation.DROP,
+          id: i
+        });
+        markers.push(marker);
+        marker.addListener('click', function() {
+          populateInfoWindow(this, largeInfoWindow);
+        });
+      }
+      document.getElementById('show-listings').addEventListener('click', showListings);
+      document.getElementById('hide-listings').addEventListener('click', hideListings);
+    }
+    function populateInfoWindow(marker, infoWindow) {
+      if (infoWindow.marker != marker) {
+        infoWindow.marker = marker;
+        infoWindow.setContent('<div>' + marker.title + '</div>');
+        infoWindow.open(map, marker);
+        infoWindow.addListener('closeclick', function() {
+          infoWindow.setMarker(null);
+        });
+      }
+    }
+    
+    function showListings() {
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+        bounds.extend(markers[i].position);
+      }
+      map.fitBounds(bounds);
+    }
+    function hideListings() {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+      }
+    }
+   </script>
+   <!--TODO: Load the JS API ASYNCHRONOUSLY below.-->
+   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNiVrOQqLRb6SuJgjBRM_bQV2hYAs-hRw&callback=initMap"></script>
+   <script>
+   </script>
+ </body>
+</html>
